@@ -21,7 +21,8 @@ def process_domains_for_test(input_lines):
             errors.append((line_count, line.rstrip(), "empty line"))
             continue
         
-        ext = tldextract.extract(raw)
+        # Normalize to lowercase before processing to handle uppercase TLDs
+        ext = tldextract.extract(raw.lower())
         if not ext.domain or not ext.suffix:
             errors.append((line_count, line.rstrip(), "invalid domain/suffix"))
             continue
@@ -132,10 +133,9 @@ def test_domain_processing_logic(input_lines, expected_output, expected_error_re
 
 
 def test_case_normalization():
-    """Test that domains are normalized to lowercase."""
-    # Note: tldextract requires lowercase TLDs, so we test with proper .lt suffix
-    output, _ = process_domains_for_test(["alfa.lt", "DEBESYLA.lt"])
-    assert output == ["alfa.lt", "debesyla.lt"]
+    """Test that domains are normalized to lowercase, including TLDs."""
+    output, _ = process_domains_for_test(["alfa.lt", "DEBESYLA.lt", "TEST.LT", "MiXeD.Lt"])
+    assert output == ["alfa.lt", "debesyla.lt", "mixed.lt", "test.lt"]
 
 
 def test_government_subdomain_preservation():

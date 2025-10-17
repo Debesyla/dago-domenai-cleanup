@@ -27,7 +27,8 @@ def clean_domains():
                 errors.append((line_count, line.rstrip(), "empty line"))
                 continue
 
-            ext = tldextract.extract(raw)
+            # Normalize to lowercase before processing to handle uppercase TLDs
+            ext = tldextract.extract(raw.lower())
             if not ext.domain or not ext.suffix:
                 errors.append((line_count, line.rstrip(), "invalid domain/suffix"))
                 continue

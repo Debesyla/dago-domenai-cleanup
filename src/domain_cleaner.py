@@ -13,6 +13,7 @@ def clean_domains():
         return
 
     cleaned = set()
+    errors = []
 
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
         line_count = 0
@@ -23,10 +24,12 @@ def clean_domains():
 
             raw = line.strip()
             if not raw:
+                errors.append((line_count, line.rstrip(), "empty line"))
                 continue
 
             ext = tldextract.extract(raw)
             if not ext.domain or not ext.suffix:
+                errors.append((line_count, line.rstrip(), "invalid domain/suffix"))
                 continue
 
             # Only process .lt domains (including .gov.lt)
@@ -46,19 +49,29 @@ def clean_domains():
                 else:
                     # Commercial .lt domains: strip subdomains
                     if ext.subdomain:
+                        errors.append((line_count, line.rstrip(), "non-govt subdomain"))
                         continue
                     domain = f"{ext.domain}.{ext.suffix}"
                     cleaned.add(domain.lower())
             else:
                 # Skip non-.lt domains entirely
+                errors.append((line_count, line.rstrip(), "non-.lt domain"))
                 continue
+
 
     OUTPUT_FILE.parent.mkdir(exist_ok=True)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for domain in sorted(cleaned):
             f.write(domain + "\n")
 
+    # Write errors to assets/errors.txt
+    errors_file = Path("assets/errors.txt")
+    with open(errors_file, "w", encoding="utf-8") as ef:
+        for line_num, line_val, reason in errors:
+            ef.write(f"Line {line_num}: {reason} | {line_val}\n")
+
     print(f"✅ Cleaned {len(cleaned)} unique .lt domains saved to {OUTPUT_FILE}")
+    print(f"⚠️ {len(errors)} lines skipped. See {errors_file} for details.")
 
 if __name__ == "__main__":
     clean_domains()

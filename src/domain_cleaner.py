@@ -15,7 +15,12 @@ def clean_domains():
     cleaned = set()
 
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
+        line_count = 0
         for line in f:
+            line_count += 1
+            if line_count % 1000 == 0:
+                print(f"...processed {line_count} lines...")
+
             raw = line.strip()
             if not raw:
                 continue

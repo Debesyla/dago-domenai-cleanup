@@ -65,4 +65,7 @@ pip install -r requirements.txt
 See [`docs/DOMAIN-CLEANER.md`](docs/DOMAIN-CLEANER.md) for full details, architecture, and extension points.
 
 ## License
-MIT
+Do whatever.
+
+## AI usage notice
+This readme.md and most of the code was AI-generated, human reviewed.
